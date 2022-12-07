@@ -5,6 +5,7 @@ import re
 import sqlite3
 from datetime import datetime, timedelta
 import base64
+import hashlib
 
 import feedparser
 from mastodon import Mastodon
@@ -13,8 +14,7 @@ import requests
 
 sql = sqlite3.connect('cache.db')
 db = sql.cursor()
-db.execute('''CREATE TABLE IF NOT EXISTS tweets (tweet text, toot text,
-           twitter text, mastodon text, instance text)''')
+db.execute('''CREATE TABLE IF NOT EXISTS entries (feed_entry_id text, toot_id text, rss_feed_url text, mastodon_username text, mastodon_instance text)''')
 
 include_author = False
 use_privacy_frontends = True
@@ -61,23 +61,28 @@ print('Retrieved ' + str(len(feed.entries)) + ' feed entries!')
 
 for feed_entry in reversed(feed.entries):
     if id in feed_entry:
-        id = feed_entry.id
+        feed_entry_id = feed_entry.id
     else:
         if len(feed_entry.title) > 0:
-            id = feed_entry.title
+            feed_entry_id = feed_entry.title
         else:
-            id = feed_entry.published_parsed
+            feed_entry_id = feed_entry.published_parsed
+    feed_entry_id = hashlib.md5(feed_entry_id.encode()).hexdigest()
 
-    print('Processing entry: ' + id)
-
-    db.execute('SELECT * FROM tweets WHERE tweet = ? AND twitter = ?  and mastodon = ? and instance = ?', (id, rss_feed_domain, mastodon_username, mastodon_instance))  # noqa
+    db.execute(
+        'SELECT * FROM entries WHERE feed_entry_id = ? AND rss_feed_url = ?  and mastodon_username = ? and mastodon_instance = ?',
+        (feed_entry_id, rss_feed_url, mastodon_username, mastodon_instance))  # noqa
     last = db.fetchone()
 
-    feed_entry_age = datetime.now() - datetime(
-        feed_entry.published_parsed.tm_year, feed_entry.published_parsed.tm_mon, feed_entry.published_parsed.tm_mday,
-        feed_entry.published_parsed.tm_hour, feed_entry.published_parsed.tm_min, feed_entry.published_parsed.tm_sec)
+    feed_entry_date = datetime(
+            feed_entry.published_parsed.tm_year, feed_entry.published_parsed.tm_mon, feed_entry.published_parsed.tm_mday,
+            feed_entry.published_parsed.tm_hour, feed_entry.published_parsed.tm_min, feed_entry.published_parsed.tm_sec)
+    feed_entry_age = datetime.now() - feed_entry_date
 
+    
     if last is None and feed_entry_age < timedelta(days = days_to_check):
+        print('Processing entry: ' + feed_entry_id + ' (' + str(feed_entry_date) + ')')
+
         toot_body = feed_entry.title
         toot_media = []
 
@@ -131,7 +136,7 @@ for feed_entry in reversed(feed.entries):
                 spoiler_text = None)
 
             if "id" in toot:
-                db.execute("INSERT INTO tweets VALUES ( ? , ? , ? , ? , ? )",
-                        (id, toot["id"], rss_feed_url, mastodon_username, mastodon_instance))
+                db.execute("INSERT INTO entries VALUES ( ? , ? , ? , ? , ? )",
+                        (feed_entry_id, toot["id"], rss_feed_url, mastodon_username, mastodon_instance))
                 sql.commit()
     sys.exit(1)
