@@ -11,7 +11,6 @@ import feedparser
 from mastodon import Mastodon
 import requests
 
-
 sql = sqlite3.connect('cache.db')
 db = sql.cursor()
 db.execute('''CREATE TABLE IF NOT EXISTS entries (feed_entry_id text, toot_id text, rss_feed_url text, mastodon_username text, mastodon_instance text)''')
@@ -69,6 +68,8 @@ for feed_entry in reversed(feed.entries):
             feed_entry_id = feed_entry.published_parsed
     feed_entry_id = hashlib.md5(feed_entry_id.encode()).hexdigest()
 
+    print('Entry found: ' + feed_entry_id)
+
     db.execute(
         'SELECT * FROM entries WHERE feed_entry_id = ? AND rss_feed_url = ?  and mastodon_username = ? and mastodon_instance = ?',
         (feed_entry_id, rss_feed_url, mastodon_username, mastodon_instance))  # noqa
@@ -79,9 +80,11 @@ for feed_entry in reversed(feed.entries):
             feed_entry.published_parsed.tm_hour, feed_entry.published_parsed.tm_min, feed_entry.published_parsed.tm_sec)
     feed_entry_age = datetime.now() - feed_entry_date
 
+    print(' > Date = ' + str(feed_entry_date))
+    print(' > Age = ' + str(feed_entry_age))
     
     if last is None and feed_entry_age < timedelta(days = days_to_check):
-        print('Processing entry: ' + feed_entry_id + ' (' + str(feed_entry_date) + ')')
+        print(' > Processing...')
 
         toot_body = feed_entry.title
         toot_media = []
@@ -139,4 +142,3 @@ for feed_entry in reversed(feed.entries):
                 db.execute("INSERT INTO entries VALUES ( ? , ? , ? , ? , ? )",
                         (feed_entry_id, toot["id"], rss_feed_url, mastodon_username, mastodon_instance))
                 sql.commit()
-    sys.exit(1)
