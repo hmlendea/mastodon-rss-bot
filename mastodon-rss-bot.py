@@ -76,9 +76,14 @@ for feed_entry in reversed(feed.entries):
         (feed_entry_id, rss_feed_url, mastodon_username, mastodon_instance))  # noqa
     last = db.fetchone()
 
+    if 'published_parsed' in feed_entry:
+        feed_entry_date_raw = feed_entry.published_parsed
+    else:
+        feed_entry_date_raw = feed_entry.updated_parsed
+
     feed_entry_date = datetime(
-            feed_entry.published_parsed.tm_year, feed_entry.published_parsed.tm_mon, feed_entry.published_parsed.tm_mday,
-            feed_entry.published_parsed.tm_hour, feed_entry.published_parsed.tm_min, feed_entry.published_parsed.tm_sec)
+            feed_entry_date_raw.tm_year, feed_entry_date_raw.tm_mon, feed_entry_date_raw.tm_mday,
+            feed_entry_date_raw.tm_hour, feed_entry_date_raw.tm_min, feed_entry_date_raw.tm_sec)
     feed_entry_age = datetime.now() - feed_entry_date
 
     print(' > Date = ' + str(feed_entry_date))
