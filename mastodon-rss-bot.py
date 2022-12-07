@@ -16,6 +16,7 @@ db = sql.cursor()
 db.execute('''CREATE TABLE IF NOT EXISTS entries (feed_entry_id text, toot_id text, rss_feed_url text, mastodon_username text, mastodon_instance text)''')
 
 include_author = False
+include_link = True
 use_privacy_frontends = True
 
 rss_feed_url = sys.argv[1]
@@ -122,14 +123,15 @@ for feed_entry in reversed(feed.entries):
         if include_author and 'authors' in feed_entry:
             toot_body += '\nSource: ' + feed_entry.authors[0].name
 
-        feed_entry_link = feed_entry.link
+        if include_link:
+            feed_entry_link = feed_entry.link
 
-        if use_privacy_frontends:
-            feed_entry_link = feed_entry_link.replace('old.reddit.com', 'libreddit.net')
-            feed_entry_link = feed_entry_link.replace('reddit.com', 'libreddit.net')
-            feed_entry_link = feed_entry_link.replace('twitter.com', 'nitter.net')
+            if use_privacy_frontends:
+                feed_entry_link = feed_entry_link.replace('old.reddit.com', 'libreddit.net')
+                feed_entry_link = feed_entry_link.replace('reddit.com', 'libreddit.net')
+                feed_entry_link = feed_entry_link.replace('twitter.com', 'nitter.net')
 
-        toot_body += '\n\n' + feed_entry_link
+            toot_body += '\n\n' + feed_entry_link
 
         # TODO: Don't readd them if they are already contained in the body
         if tags_to_add:
