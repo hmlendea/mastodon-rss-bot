@@ -50,7 +50,7 @@ try:
         mastodon_email_address,
         password = mastodon_password,
         scopes = ['read', 'write'],
-        to_file = "app_" + mastodon_username + "@" + mastodon_instance ".secret"
+        to_file = "app_" + mastodon_username + "@" + mastodon_instance + ".secret"
     )
 except:
     print("ERROR: Failed to log " + mastodon_username + " into " + mastodon_instance)
