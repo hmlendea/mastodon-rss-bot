@@ -136,6 +136,10 @@ for feed_entry in reversed(feed.entries):
                 feed_entry_link = feed_entry_link.replace('reddit.com', 'libreddit.net')
                 feed_entry_link = feed_entry_link.replace('twitter.com', 'nitter.net')
 
+            feed_entry_link = feed_entry_link.replace('www.', '')
+            feed_entry_link = re.sub('\?utm.*$', '', feed_entry_link)
+            feed_entry_link = re.sub('/$', '', feed_entry_link)
+
             toot_body += '\n\n' + feed_entry_link
 
         # TODO: Don't readd them if they are already contained in the body
