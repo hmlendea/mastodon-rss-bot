@@ -66,7 +66,10 @@ for feed_entry in reversed(feed.entries):
         if len(feed_entry.title) > 0:
             feed_entry_id = feed_entry.title
         else:
-            feed_entry_id = feed_entry.published_parsed
+            if 'published_parsed' in feed_entry:
+                feed_entry_id = str(feed_entry.published_parsed)
+            else:
+                feed_entry_id = str(feed_entry.updated_parsed)
     feed_entry_id = hashlib.md5(feed_entry_id.encode()).hexdigest()
 
     print('Entry found: ' + feed_entry_id)
