@@ -82,7 +82,7 @@ for feed_entry in reversed(feed.entries):
 
     print(' > Date = ' + str(feed_entry_date))
     print(' > Age = ' + str(feed_entry_age))
-    
+
     if last is None and feed_entry_age < timedelta(days = days_to_check):
         print(' > Processing...')
 
@@ -91,10 +91,16 @@ for feed_entry in reversed(feed.entries):
 
         if 'summary' in feed_entry:
             for p in re.finditer(r"https://pbs.twimg.com/[^ \xa0\"]*", feed_entry.summary):
-                media_url = p.group(0)
-                print(' > Found Twitter media: ' + media_url)
+                twitter_media_url = p.group(0)
+                print(' > Found Twitter media: ' + twitter_media_url)
+
+                nitter_media_url = twitter_media_url.replace('https://pbs.twimg.com/media/', 'https://nitter.unixfox.eu/pic/media%2F')
+                nitter_media_url = nitter_media_url.replace('?format=', '.')
+                nitter_media_url = nitter_media_url.replace('&amp;name=orig', '')
+                print('   > Nitter media URL = ' + nitter_media_url)
+
                 try:
-                    media = requests.get(media_url)
+                    media = requests.get(nitter_media_url)
                     media_posted = mastodon_api.media_post(
                         media.content,
                         mime_type = media.headers.get('content-type'))
