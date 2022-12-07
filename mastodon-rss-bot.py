@@ -30,11 +30,11 @@ days_to_check = int(sys.argv[7])
 rss_feed_domain = re.sub('^[a-z]*://', '', rss_feed_url)
 rss_feed_domain = re.sub('/.*$', '', rss_feed_domain)
 
-if not os.path.isfile(mastodon_instance + '.secret'):
+if not os.path.isfile("app_" + mastodon_instance + '.secret'):
     if Mastodon.create_app(
         rss_feed_domain,
         api_base_url = 'https://' + mastodon_instance,
-        to_file = mastodon_instance+'.secret'
+        to_file = "app_" + mastodon_instance + '.secret'
     ):
         print('Successfully created the application on instance ' + mastodon_instance)
     else:
@@ -43,14 +43,14 @@ if not os.path.isfile(mastodon_instance + '.secret'):
 
 try:
     mastodon_api = Mastodon(
-        client_id = mastodon_instance + '.secret',
+        client_id = "app_" + mastodon_instance + '.secret',
         api_base_url = 'https://' + mastodon_instance
     )
     mastodon_api.log_in(
         mastodon_email_address,
         password = mastodon_password,
         scopes = ['read', 'write'],
-        to_file = mastodon_username + ".secret"
+        to_file = "app_" + mastodon_username + "@" + mastodon_instance ".secret"
     )
 except:
     print("ERROR: Failed to log " + mastodon_username + " into " + mastodon_instance)
