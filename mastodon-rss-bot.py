@@ -18,6 +18,7 @@ db.execute('''CREATE TABLE IF NOT EXISTS entries (feed_entry_id text, toot_id te
 include_author = False
 include_link = True
 use_privacy_frontends = True
+maximum_toots_count = 1
 
 rss_feed_url = sys.argv[1]
 mastodon_instance = sys.argv[2]
@@ -59,6 +60,7 @@ except:
 feed = feedparser.parse(rss_feed_url)
 print('Retrieved ' + str(len(feed.entries)) + ' feed entries!')
 
+toots_count = 0
 for feed_entry in reversed(feed.entries):
     if id in feed_entry:
         feed_entry_id = feed_entry.id
@@ -162,3 +164,8 @@ for feed_entry in reversed(feed.entries):
                 db.execute("INSERT INTO entries VALUES ( ? , ? , ? , ? , ? )",
                         (feed_entry_id, toot["id"], rss_feed_url, mastodon_username, mastodon_instance))
                 sql.commit()
+
+        toots_count += 1
+        if toots_count == maximum_toots_count:
+            print('Exiting... Reached the maximum number of toots per run!')
+            break
