@@ -145,7 +145,7 @@ for feed_entry in reversed(feed.entries):
             feed_entry_link = re.sub('\?utm.*$', '', feed_entry_link)
             feed_entry_link = re.sub('/$', '', feed_entry_link)
 
-            toot_body += '\n\n' + feed_entry_link
+            toot_body += '\n\n🔗 ' + feed_entry_link
 
         # TODO: Don't readd them if they are already contained in the body
         if tags_to_add:
