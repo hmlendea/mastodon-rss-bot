@@ -130,6 +130,17 @@ for feed_entry in reversed(feed.entries):
                 except:
                     print('   > Could not upload to Mastodon!')
 
+        for link in feed_entry.links:
+            if 'image' in link.type:
+                try:
+                    media = requests.get(link.href)
+                    media_posted = mastodon_api.media_post(
+                        media.content,
+                        mime_type = link.type)
+                    toot_media.append(media_posted['id'])
+                except:
+                    print(' > Could not upload to Mastodon!')
+
         if include_author and 'authors' in feed_entry:
             toot_body += '\nSource: ' + feed_entry.authors[0].name
 
