@@ -10,6 +10,8 @@ import hashlib
 import feedparser
 from mastodon import Mastodon
 import requests
+import urllib.request
+from bs4 import BeautifulSoup
 
 sql = sqlite3.connect('cache.db')
 db = sql.cursor()
@@ -17,6 +19,7 @@ db.execute('''CREATE TABLE IF NOT EXISTS entries (feed_entry_id text, toot_id te
 
 include_author = False
 include_link = True
+include_link_thumbnail = True
 use_privacy_frontends = True
 maximum_toots_count = 1
 
@@ -129,6 +132,23 @@ for feed_entry in reversed(feed.entries):
                     toot_media.append(media_posted['id'])
                 except:
                     print('   > Could not upload to Mastodon!')
+
+        if include_link_thumbnail:
+            linked_page = urllib.request.urlopen(feed_entry.link)
+            soup = BeautifulSoup(linked_page, 'lxml')
+            thumbnail_url = str(soup.find('meta', property='og:image'))
+            thumbnail_url = thumbnail_url.replace('<meta content=\"', '')
+            thumbnail_url = re.sub('\".*', '', thumbnail_url)
+            print(' > Found link thumbnail media: ' + thumbnail_url)
+
+            try:
+                media = requests.get(thumbnail_url)
+                media_posted = mastodon_api.media_post(
+                    media.content,
+                    mime_type = media.headers.get('content-type'))
+                toot_media.append(media_posted['id'])
+            except:
+                print(' > Could not upload to Mastodon!')
 
         if include_author and 'authors' in feed_entry:
             toot_body += '\nSource: ' + feed_entry.authors[0].name
