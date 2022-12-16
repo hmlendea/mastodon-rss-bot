@@ -101,54 +101,47 @@ for feed_entry in reversed(feed.entries):
         print(' > Processing...')
 
         toot_body = feed_entry.title
-        toot_media = []
+        media_urls = []
 
         if 'summary' in feed_entry:
             for p in re.finditer(r"https://pbs.twimg.com/[^ \xa0\"]*", feed_entry.summary):
                 twitter_media_url = p.group(0)
-                print(' > Found Twitter media: ' + twitter_media_url)
+                #print(' > Found Twitter media: ' + twitter_media_url)
 
                 nitter_media_url = twitter_media_url.replace('https://pbs.twimg.com/media/', 'https://nitter.unixfox.eu/pic/media%2F')
                 nitter_media_url = nitter_media_url.replace('?format=', '.')
                 nitter_media_url = nitter_media_url.replace('&amp;name=orig', '')
-                print('   > Nitter media URL = ' + nitter_media_url)
 
-                try:
-                    media = requests.get(nitter_media_url)
-                    media_posted = mastodon_api.media_post(
-                        media.content,
-                        mime_type = media.headers.get('content-type'))
-                    toot_media.append(media_posted['id'])
-                except:
-                    print(' > Could not upload to Mastodon!')
+                #print('   > Resulting Nitter media URL = ' + nitter_media_url)
+                media_urls.append(nitter_media_url)
 
             for p in re.finditer(r"https://i.redd.it/[a-zA-Z0-9]*.(gif|jpg|mp4|png|webp)", feed_entry.summary):
                 media_url = p.group(0)
-                print(' > Found Reddit media: ' + media_url)
-                try:
-                    media = requests.get(media_url)
-                    media_posted = mastodon_api.media_post(
-                        media.content, mime_type=media.headers.get('content-type'))
-                    toot_media.append(media_posted['id'])
-                except:
-                    print('   > Could not upload to Mastodon!')
-
-        if include_link_thumbnail:
+                #print(' > Found Reddit media: ' + media_url)
+                media_urls.append(media_url)
+                
+        if include_link_thumbnail and media_urls is not None:
             linked_page = urllib.request.urlopen(feed_entry.link)
             soup = BeautifulSoup(linked_page, 'lxml')
+            
             thumbnail_url = str(soup.find('meta', property='og:image'))
             thumbnail_url = thumbnail_url.replace('<meta content=\"', '')
             thumbnail_url = re.sub('\".*', '', thumbnail_url)
-            print(' > Found link thumbnail media: ' + thumbnail_url)
 
+            #print(' > Found link thumbnail media: ' + thumbnail_url)
+            media_urls.append(thumbnail_url)
+
+        toot_media = []
+        for media_url in media_urls:        
             try:
-                media = requests.get(thumbnail_url)
+                print (' > Uploading media to Mastodon: ' + media_url)
+                media = requests.get(media_url)
                 media_posted = mastodon_api.media_post(
                     media.content,
                     mime_type = media.headers.get('content-type'))
                 toot_media.append(media_posted['id'])
             except:
-                print(' > Could not upload to Mastodon!')
+                print('   > FAILURE!')
 
         if include_author and 'authors' in feed_entry:
             toot_body += '\nSource: ' + feed_entry.authors[0].name
