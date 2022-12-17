@@ -21,6 +21,7 @@ include_author = False
 include_link = True
 include_link_thumbnail = True
 use_privacy_frontends = True
+use_shortlink = True
 maximum_toots_count = 1
 
 rss_feed_url = sys.argv[1]
@@ -103,6 +104,10 @@ for feed_entry in reversed(feed.entries):
         toot_body = feed_entry.title
         media_urls = []
 
+        if include_link or include_link_thumbnail:
+            linked_page_response = urllib.request.urlopen(feed_entry.link)
+            linked_page = BeautifulSoup(linked_page_response, 'lxml')
+
         if 'summary' in feed_entry:
             for p in re.finditer(r"https://pbs.twimg.com/[^ \xa0\"]*", feed_entry.summary):
                 twitter_media_url = p.group(0)
@@ -121,10 +126,7 @@ for feed_entry in reversed(feed.entries):
                 media_urls.append(media_url)
                 
         if include_link_thumbnail and media_urls is not None:
-            linked_page = urllib.request.urlopen(feed_entry.link)
-            soup = BeautifulSoup(linked_page, 'lxml')
-            
-            thumbnail_url = str(soup.find('meta', property='og:image'))
+            thumbnail_url = str(linked_page.find('meta', property='og:image'))
             thumbnail_url = thumbnail_url.replace('<meta content=\"', '')
             thumbnail_url = re.sub('\".*', '', thumbnail_url)
 
@@ -132,7 +134,10 @@ for feed_entry in reversed(feed.entries):
             media_urls.append(thumbnail_url)
 
         toot_media = []
-        for media_url in media_urls:        
+        for media_url in media_urls:
+            if media_url is None or media_url == 'None':
+                continue
+                
             try:
                 print (' > Uploading media to Mastodon: ' + media_url)
                 media = requests.get(media_url)
@@ -159,6 +164,12 @@ for feed_entry in reversed(feed.entries):
 
         if include_link:
             feed_entry_link = feed_entry.link
+
+            if use_shortlink:
+                feed_entry_shortlink_node = linked_page.find('link', rel='shortlink')
+                if feed_entry_shortlink_node is not None:
+                    feed_entry_link = str(feed_entry_shortlink_node).replace('<link href=\"', '')
+                    feed_entry_link = re.sub('\".*', '', feed_entry_link)
 
             if use_privacy_frontends:
                 feed_entry_link = feed_entry_link.replace('old.reddit.com', 'libreddit.net')
