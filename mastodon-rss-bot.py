@@ -195,6 +195,7 @@ for feed_entry in reversed(feed.entries):
                 feed_entry_link = feed_entry_link.replace('old.reddit.com', 'libreddit.net')
                 feed_entry_link = feed_entry_link.replace('reddit.com', 'libreddit.net')
                 feed_entry_link = feed_entry_link.replace('twitter.com', 'nitter.net')
+                feed_entry_link = feed_entry_link.replace('youtube.com', 'yewtu.be')
 
             feed_entry_link = feed_entry_link.replace('www.', '')
             feed_entry_link = re.sub('\?utm.*$', '', feed_entry_link)
