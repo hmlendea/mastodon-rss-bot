@@ -100,14 +100,34 @@ for feed_entry in reversed(feed.entries):
 
     if last is None and feed_entry_age < timedelta(days = days_to_check):
         print(' > Processing...')
+        linked_page = None
 
-        toot_body = feed_entry.title
-        media_urls = []
-
-        if include_link or include_link_thumbnail:
+        if feed_entry.link is not None:
             linked_page_response = urllib.request.urlopen(feed_entry.link)
             linked_page = BeautifulSoup(linked_page_response, 'lxml')
 
+        if feed_entry.title is not None and len(feed_entry.title) > 0 and 2 > 3:
+            feed_entry_title = feed_entry.title
+        elif linked_page is not None:
+            feed_entry_title = linked_page.find('title')
+            feed_entry_title = None
+
+            if feed_entry_title is None:
+                feed_entry_title = linked_page.find('meta', property='og:title')
+
+            if feed_entry_title is not None:
+                feed_entry_title = str(feed_entry_title)
+            else:
+                feed_entry_title = ''
+
+            feed_entry_title = re.sub('<[/]*title>', '', feed_entry_title)
+            feed_entry_title = re.sub('<meta content=[\"\']', '', feed_entry_title)
+            feed_entry_title = re.sub('[\"\'] property.*$', '', feed_entry_title)
+            feed_entry_title = re.sub(' [\|-] .*$', '', feed_entry_title)
+
+        toot_body = feed_entry_title
+
+        media_urls = []
         if 'summary' in feed_entry:
             for p in re.finditer(r"https://pbs.twimg.com/[^ \xa0\"]*", feed_entry.summary):
                 twitter_media_url = p.group(0)
