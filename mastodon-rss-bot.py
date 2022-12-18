@@ -112,7 +112,10 @@ for feed_entry in reversed(feed.entries):
             except:
                 print('   > FAILURE!')
 
-        if feed_entry.title is not None and len(feed_entry.title) > 0:
+        if 'twitter.com' in rss_feed_url or '/twitter/' in rss_feed_url:
+            feed_entry_title = feed_entry.description
+            feed_entry_title = re.sub('<[^>]*>', '', feed_entry_title)
+        elif feed_entry.title is not None and len(feed_entry.title) > 0:
             feed_entry_title = feed_entry.title
         elif linked_page is not None:
             feed_entry_title = linked_page.find('title')
