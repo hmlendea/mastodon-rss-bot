@@ -103,8 +103,14 @@ for feed_entry in reversed(feed.entries):
         linked_page = None
 
         if feed_entry.link is not None:
-            linked_page_response = urllib.request.urlopen(feed_entry.link)
-            linked_page = BeautifulSoup(linked_page_response, 'lxml')
+            try:
+                print(' > Retrieving the linked page: ' + feed_entry.link)
+                linked_page_request = urllib.request.Request(feed_entry.link, headers={'User-Agent': 'Mozilla/5.0'})
+                linked_page_response = urllib.request.urlopen(linked_page_request).read()
+                linked_page_response = linked_page_response.decode('UTF-8')
+                linked_page = BeautifulSoup(linked_page_response, 'lxml')
+            except:
+                print('   > FAILURE!')
 
         if feed_entry.title is not None and len(feed_entry.title) > 0:
             feed_entry_title = feed_entry.title
@@ -145,7 +151,7 @@ for feed_entry in reversed(feed.entries):
                 #print(' > Found Reddit media: ' + media_url)
                 media_urls.append(media_url)
                 
-        if include_link_thumbnail and media_urls is not None:
+        if include_link_thumbnail and media_urls is not None and linked_page is not None:
             thumbnail_url = str(linked_page.find('meta', property='og:image'))
             thumbnail_url = thumbnail_url.replace('<meta content=\"', '')
             thumbnail_url = re.sub('\".*', '', thumbnail_url)
@@ -185,7 +191,7 @@ for feed_entry in reversed(feed.entries):
         if include_link:
             feed_entry_link = feed_entry.link
 
-            if use_shortlink:
+            if use_shortlink and linked_page is not None:
                 feed_entry_shortlink_node = linked_page.find('link', rel='shortlink')
                 if feed_entry_shortlink_node is not None:
                     feed_entry_link = str(feed_entry_shortlink_node).replace('<link href=\"', '')
