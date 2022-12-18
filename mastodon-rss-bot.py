@@ -106,7 +106,7 @@ for feed_entry in reversed(feed.entries):
             linked_page_response = urllib.request.urlopen(feed_entry.link)
             linked_page = BeautifulSoup(linked_page_response, 'lxml')
 
-        if feed_entry.title is not None and len(feed_entry.title) > 0 and 2 > 3:
+        if feed_entry.title is not None and len(feed_entry.title) > 0:
             feed_entry_title = feed_entry.title
         elif linked_page is not None:
             feed_entry_title = linked_page.find('title')
