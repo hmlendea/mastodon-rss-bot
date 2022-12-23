@@ -22,12 +22,12 @@ WantedBy=timers.target
 **Service unit**:
 ```gitconfig
 [Unit]
-Description=RSS bot for Mastodon (%i)
+Description=RSS bot for Mastodon
 After=network.target
 
 [Service]
-WorkingDirectory=/home/horatiu/bots/mastodon-rss-bot/%i
-ExecStart=/bin/bash /home/horatiu/bots/mastodon-rss-bot/%i/run.sh
+WorkingDirectory=/home/horatiu/bots/mastodon-rss-bot
+ExecStart=/bin/bash /home/horatiu/bots/mastodon-rss-bot/run.sh
 User=horatiu
 RuntimeMaxSec=60
 
