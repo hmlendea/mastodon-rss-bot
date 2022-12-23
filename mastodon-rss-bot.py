@@ -13,6 +13,8 @@ import requests
 import urllib.request
 from bs4 import BeautifulSoup
 
+import text_replacements
+
 sql = sqlite3.connect('cache.db')
 db = sql.cursor()
 db.execute('''CREATE TABLE IF NOT EXISTS entries (feed_entry_id text, toot_id text, rss_feed_url text, mastodon_username text, mastodon_instance text)''')
@@ -82,7 +84,7 @@ for feed_entry in reversed(feed.entries):
 
     db.execute(
         'SELECT * FROM entries WHERE feed_entry_id = ? AND rss_feed_url = ?  and mastodon_username = ? and mastodon_instance = ?',
-        (feed_entry_id, rss_feed_url, mastodon_username, mastodon_instance))  # noqa
+        (feed_entry_id, rss_feed_url, mastodon_username, mastodon_instance))
     last = db.fetchone()
 
     if 'published_parsed' in feed_entry:
@@ -134,7 +136,7 @@ for feed_entry in reversed(feed.entries):
             feed_entry_title = re.sub('[\"\'] property.*$', '', feed_entry_title)
             feed_entry_title = re.sub(' [\|-] .*$', '', feed_entry_title)
 
-        toot_body = feed_entry_title
+        toot_body = text_replacements.apply(feed_entry_title)
 
         media_urls = []
         if 'summary' in feed_entry:
@@ -153,7 +155,7 @@ for feed_entry in reversed(feed.entries):
                 media_url = p.group(0)
                 #print(' > Found Reddit media: ' + media_url)
                 media_urls.append(media_url)
-                
+
         if include_link_thumbnail and media_urls is not None and linked_page is not None:
             thumbnail_url = str(linked_page.find('meta', property='og:image'))
             thumbnail_url = thumbnail_url.replace('<meta content=\"', '')
