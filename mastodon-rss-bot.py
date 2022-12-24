@@ -14,6 +14,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 
 import text_replacements
+import dynamic_tags
 
 sql = sqlite3.connect('cache.db')
 db = sql.cursor()
@@ -216,7 +217,12 @@ for feed_entry in reversed(feed.entries):
 
         # TODO: Don't readd them if they are already contained in the body
         if tags_to_add:
+            dynamic_tags_to_add = dynamic_tags.get(toot_body)
+
             toot_body += '\n\n' + tags_to_add
+
+            if dynamic_tags_to_add is not None:
+                toot_body += ' ' + dynamic_tags_to_add
 
         if toot_media is not None:
             toot = mastodon_api.status_post(
