@@ -190,9 +190,6 @@ for feed_entry in reversed(feed.entries):
                 except:
                     print(' > Could not upload to Mastodon!')
 
-        if include_author and 'authors' in feed_entry:
-            toot_body += '\nSource: ' + feed_entry.authors[0].name
-
         if include_link:
             feed_entry_link = feed_entry.link
 
@@ -213,6 +210,9 @@ for feed_entry in reversed(feed.entries):
             feed_entry_link = re.sub('/$', '', feed_entry_link)
 
             toot_body += '\n\n🔗 ' + feed_entry_link
+
+        if include_author and 'authors' in feed_entry:
+            toot_body += '\nby ' + feed_entry.authors[0].name
 
         # TODO: Don't readd them if they are already contained in the body
         if tags_to_add:
