@@ -146,7 +146,7 @@ for feed_entry in reversed(feed.entries):
 
                 nitter_media_url = twitter_media_url.replace('https://pbs.twimg.com/media/', 'https://nitter.unixfox.eu/pic/media%2F')
                 nitter_media_url = nitter_media_url.replace('?format=', '.')
-                nitter_media_url = nitter_media_url.replace('&amp;name=orig', '')
+                nitter_media_url = re.sub('&amp;name=[^&]*', '', nitter_media_url)
 
                 #print('   > Resulting Nitter media URL = ' + nitter_media_url)
                 media_urls.append(nitter_media_url)
