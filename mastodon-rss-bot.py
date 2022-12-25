@@ -215,14 +215,25 @@ for feed_entry in reversed(feed.entries):
         if include_author and 'authors' in feed_entry:
             toot_body += '\nby ' + feed_entry.authors[0].name
 
-        # TODO: Don't readd them if they are already contained in the body
-        if tags_to_add:
-            dynamic_tags_to_add = dynamic_tags.get(toot_body)
+        all_tags_to_add = ''
+        dynamic_tags_to_add = dynamic_tags.get(toot_body)
 
-            toot_body += '\n\n' + tags_to_add
+        all_tags_to_add += ' ' + tags_to_add if tags_to_add else None
+        all_tags_to_add += ' ' + dynamic_tags_to_add if dynamic_tags_to_add else None
 
-            if dynamic_tags_to_add is not None:
-                toot_body += ' ' + dynamic_tags_to_add
+        if tags_to_add != '':
+            filtered_tags_to_add = ''
+
+            for tag in all_tags_to_add.split(' '):
+                if '#' not in tag:
+                    filtered_tags_to_add += ' ' + tag
+                    continue
+
+                if (tag not in toot_body and
+                    tag not in filtered_tags_to_add):
+                    filtered_tags_to_add += ' ' + tag
+
+            toot_body += '\n\n' + filtered_tags_to_add.lstrip().rstrip()
 
         if toot_media is not None:
             toot = mastodon_api.status_post(
