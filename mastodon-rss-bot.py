@@ -218,8 +218,8 @@ for feed_entry in reversed(feed.entries):
         all_tags_to_add = ''
         dynamic_tags_to_add = dynamic_tags.get(toot_body)
 
-        all_tags_to_add += ' ' + tags_to_add if tags_to_add else None
-        all_tags_to_add += ' ' + dynamic_tags_to_add if dynamic_tags_to_add else None
+        if tags_to_add: all_tags_to_add += ' ' + tags_to_add
+        if dynamic_tags_to_add: all_tags_to_add += ' ' + dynamic_tags_to_add
 
         if tags_to_add != '':
             filtered_tags_to_add = ''
