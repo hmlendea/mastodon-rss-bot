@@ -140,6 +140,8 @@ for feed_entry in reversed(feed.entries):
         toot_body = text_replacements.apply(feed_entry_title)
 
         media_urls = []
+        media_urls_posted = []
+
         if 'summary' in feed_entry:
             for p in re.finditer(r"https://pbs.twimg.com/[^ \xa0\"]*", feed_entry.summary):
                 twitter_media_url = p.group(0)
@@ -167,7 +169,7 @@ for feed_entry in reversed(feed.entries):
 
         toot_media = []
         for media_url in media_urls:
-            if media_url is None or media_url == 'None':
+            if media_url is None or media_url == 'None' or media_urls_posted.count(media_url) > 0:
                 continue
                 
             try:
@@ -177,17 +179,22 @@ for feed_entry in reversed(feed.entries):
                     media.content,
                     mime_type = media.headers.get('content-type'))
                 toot_media.append(media_posted['id'])
+                media_urls_posted.append(media_url)
             except:
                 print('   > FAILURE!')
 
         for link in feed_entry.links:
             if 'image' in link.type:
+                if media_urls_posted.count(link.href) > 0:
+                    continue
+                    
                 try:
                     media = requests.get(link.href)
                     media_posted = mastodon_api.media_post(
                         media.content,
                         mime_type = link.type)
                     toot_media.append(media_posted['id'])
+                    media_urls_posted.append(link.href)
                 except:
                     print(' > Could not upload to Mastodon!')
 
