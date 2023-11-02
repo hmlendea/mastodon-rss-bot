@@ -1,6 +1,6 @@
 import re
 
-def get(text):
+def get(text, language):
     tags = ''
 
     # Build your own custom dynamic tags. For example:
