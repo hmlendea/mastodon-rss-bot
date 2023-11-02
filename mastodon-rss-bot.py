@@ -59,8 +59,8 @@ def determine_content_language(text):
             ' miliarde ' in text):
             language = 'ro'
 
-    if (does_substring_exist('Ambasadorul', text, tags) or
-        does_substring_exist('interzis', text, tags)):
+    if ('mbasadorul' in text or
+        'interzis' in text):
         language = 'ro'
 
     return language
