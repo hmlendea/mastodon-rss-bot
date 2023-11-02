@@ -1,3 +1,6 @@
+tests.py
+test.sh
+
 *.secret
 *.db
 *.sh
