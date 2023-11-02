@@ -38,6 +38,33 @@ days_to_check = int(sys.argv[7])
 rss_feed_domain = re.sub('^[a-z]*://', '', rss_feed_url)
 rss_feed_domain = re.sub('/.*$', '', rss_feed_domain)
 
+def determine_content_language(text):
+    language = 'english'
+
+    if ('ă' in text or 'â' in text or 'î' in text or 'ș' in text or 'ț' in text):
+        language = 'romanian'
+    else:
+        language = 'english'
+
+    if language != 'english':
+        if (' and ' in text or
+            ' its ' in text or
+            ' of ' in text or
+            ' the ' in text or
+            ' was ' in text):
+            language = 'english'
+
+    if language != 'romanian':
+        if (' de la ' in text or
+            ' miliarde ' in text):
+            language = 'romanian'
+
+    if (does_substring_exist('Ambasadorul', text, tags) or
+        does_substring_exist('interzis', text, tags)):
+        language = 'romanian'
+
+    return language
+
 if not os.path.isfile("app_" + mastodon_instance + '.secret'):
     if Mastodon.create_app(
         rss_feed_domain,
@@ -137,7 +164,8 @@ for feed_entry in reversed(feed.entries):
             feed_entry_title = re.sub('[\"\'] property.*$', '', feed_entry_title)
             feed_entry_title = re.sub(' [\|-] .*$', '', feed_entry_title)
 
-        toot_body = text_replacements.apply(feed_entry_title)
+        toot_language = determine_content_language(feed_entry_title)
+        toot_body = text_replacements.apply(feed_entry_title, toot_language)
 
         media_urls = []
         media_urls_posted = []
@@ -223,7 +251,7 @@ for feed_entry in reversed(feed.entries):
             toot_body += '\nby ' + feed_entry.authors[0].name
 
         all_tags_to_add = ''
-        dynamic_tags_to_add = dynamic_tags.get(toot_body)
+        dynamic_tags_to_add = dynamic_tags.get(toot_body, toot_language)
 
         if tags_to_add: all_tags_to_add += ' ' + tags_to_add
         if dynamic_tags_to_add: all_tags_to_add += ' ' + dynamic_tags_to_add
