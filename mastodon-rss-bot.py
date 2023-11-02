@@ -111,8 +111,8 @@ for feed_entry in reversed(feed.entries):
     print('Entry found: ' + feed_entry_id)
 
     db.execute(
-        'SELECT * FROM entries WHERE feed_entry_id = ? AND rss_feed_url = ?  and mastodon_username = ? and mastodon_instance = ?',
-        (feed_entry_id, rss_feed_url, mastodon_username, mastodon_instance))
+        'SELECT * FROM entries WHERE feed_entry_id = ? AND mastodon_username = ? AND mastodon_instance = ?',
+        (feed_entry_id, mastodon_username, mastodon_instance))
     last = db.fetchone()
 
     if 'published_parsed' in feed_entry:
