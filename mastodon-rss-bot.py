@@ -6,6 +6,7 @@ import sqlite3
 from datetime import datetime, timedelta
 import base64
 import hashlib
+import random
 
 import feedparser
 from mastodon import Mastodon
@@ -25,6 +26,7 @@ include_link = True
 include_link_thumbnail = True
 use_privacy_frontends = True
 use_shortlink = True
+use_monetised_links = True
 maximum_toots_count = 1
 
 rss_feed_url = sys.argv[1]
@@ -65,12 +67,24 @@ def determine_content_language(text):
 
     return language
 
+def get_monetised_link(original_link):
+    userid = '1092341'
+
+    if isinstance(original_link, bytes):
+        buffer = original_link
+    else:
+        buffer = original_link.encode('latin-1' if isinstance(original_link, str) else 'utf-8')
+
+    encoded_link = base64.b64encode(buffer).decode('utf-8')
+    monetised_link = f"https://link-to.net/{userid}/{random.random() * 1000}/dynamic?r={encoded_link}"
+
+    return monetised_link
+
 if not os.path.isfile("app_" + mastodon_instance + '.secret'):
     if Mastodon.create_app(
         rss_feed_domain,
         api_base_url = 'https://' + mastodon_instance,
-        to_file = "app_" + mastodon_instance + '.secret'
-    ):
+        to_file = "app_" + mastodon_instance + '.secret'):
         print('Successfully created the application on instance ' + mastodon_instance)
     else:
         print('Failed to create the application on instance ' + mastodon_instance)
@@ -245,7 +259,7 @@ for feed_entry in reversed(feed.entries):
             feed_entry_link = re.sub('\?utm.*$', '', feed_entry_link)
             feed_entry_link = re.sub('/$', '', feed_entry_link)
 
-            toot_body += '\n\n🔗 ' + feed_entry_link
+            toot_body += '\n\n🔗 ' + get_monetised_link(feed_entry_link)
 
         if include_author and 'authors' in feed_entry:
             toot_body += '\nby ' + feed_entry.authors[0].name
