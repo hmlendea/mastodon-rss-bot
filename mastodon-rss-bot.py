@@ -16,6 +16,8 @@ from bs4 import BeautifulSoup
 import text_replacements
 import dynamic_tags
 
+from fake_useragent import UserAgent
+
 sql = sqlite3.connect('cache.db')
 db = sql.cursor()
 db.execute('''CREATE TABLE IF NOT EXISTS entries (feed_entry_id text, toot_id text, rss_feed_url text, mastodon_username text, mastodon_instance text)''')
@@ -135,12 +137,14 @@ for feed_entry in reversed(feed.entries):
         if feed_entry.link is not None:
             try:
                 print(' > Retrieving the linked page: ' + feed_entry.link)
-                linked_page_request = urllib.request.Request(feed_entry.link, headers={'User-Agent': 'Mozilla/5.0'})
+                user_agent = UserAgent().firefox
+                headers = {'User-Agent': user_agent}
+                linked_page_request = urllib.request.Request(feed_entry.link, headers=headers)
                 linked_page_response = urllib.request.urlopen(linked_page_request).read()
                 linked_page_response = linked_page_response.decode('UTF-8')
                 linked_page = BeautifulSoup(linked_page_response, 'lxml')
-            except:
-                print('   > FAILURE!')
+            except Exception as ex:
+                print('   > FAILURE!', ex)
 
         if 'twitter.com' in rss_feed_url or '/twitter/' in rss_feed_url:
             feed_entry_title = feed_entry.description
@@ -202,7 +206,9 @@ for feed_entry in reversed(feed.entries):
                 
             try:
                 print (' > Uploading media to Mastodon: ' + media_url)
-                media = requests.get(media_url)
+                user_agent = UserAgent().firefox
+                headers = {'User-Agent': user_agent}
+                media = requests.get(media_url, headers=headers)
                 media_posted = mastodon_api.media_post(
                     media.content,
                     mime_type = media.headers.get('content-type'))
