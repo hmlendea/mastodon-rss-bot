@@ -166,7 +166,7 @@ for feed_entry in reversed(feed.entries):
             feed_entry_title = re.sub('<[/]*title>', '', feed_entry_title)
             feed_entry_title = re.sub('<meta content=[\"\']', '', feed_entry_title)
             feed_entry_title = re.sub('[\"\'] property.*$', '', feed_entry_title)
-            feed_entry_title = re.sub(' [\|-] .*$', '', feed_entry_title)
+            feed_entry_title = re.sub(' [\\|-] .*$', '', feed_entry_title)
 
         toot_language = determine_content_language(feed_entry_title)
         toot_body = text_replacements.apply(feed_entry_title, toot_language)
@@ -248,7 +248,7 @@ for feed_entry in reversed(feed.entries):
                 feed_entry_link = feed_entry_link.replace('youtube.com', 'yewtu.be')
 
             feed_entry_link = feed_entry_link.replace('www.', '')
-            feed_entry_link = re.sub('\?utm.*$', '', feed_entry_link)
+            feed_entry_link = re.sub('\\?utm.*$', '', feed_entry_link)
             feed_entry_link = re.sub('/$', '', feed_entry_link)
 
             toot_body += '\n\n🔗 ' + feed_entry_link
