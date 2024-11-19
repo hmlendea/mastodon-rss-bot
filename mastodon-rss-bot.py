@@ -170,6 +170,7 @@ for feed_entry in reversed(feed.entries):
 
         toot_language = determine_content_language(feed_entry_title)
         toot_body = text_replacements.apply(feed_entry_title, toot_language)
+        toot_body = re.sub('[#][#]*', '#', toot_body);
 
         media_urls = []
         media_urls_posted = []
