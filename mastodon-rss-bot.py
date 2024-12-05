@@ -61,7 +61,8 @@ def determine_content_language(text):
             ' miliarde ' in text):
             language = 'ro'
 
-    if ('mbasadorul' in text or
+    if (' al patrulea ' in text or
+        'mbasadorul' in text or
         'interzis' in text):
         language = 'ro'
 
@@ -168,9 +169,16 @@ for feed_entry in reversed(feed.entries):
             feed_entry_title = re.sub('[\"\'] property.*$', '', feed_entry_title)
             feed_entry_title = re.sub(' [\\|-] .*$', '', feed_entry_title)
 
+        if '(P)' in feed_entry_title:
+            print(' > This article is an ad! Skipping...')
+            continue
+
+        if re.match(r"^[ ]*- [A-Z][a-z]*$", feed_entry_title):
+            print(' > The title is missing!')
+            raise ValueError('The title is missing')
+
         toot_language = determine_content_language(feed_entry_title)
         toot_body = text_replacements.apply(feed_entry_title, toot_language)
-        toot_body = re.sub('[#][#]*', '#', toot_body);
 
         media_urls = []
         media_urls_posted = []
@@ -271,11 +279,18 @@ for feed_entry in reversed(feed.entries):
                     filtered_tags_to_add += ' ' + tag
                     continue
 
-                if (tag not in toot_body and
-                    tag not in filtered_tags_to_add):
+                if (tag.lower() not in toot_body.lower() and
+                    tag.lower() not in filtered_tags_to_add.lower()):
                     filtered_tags_to_add += ' ' + tag
 
             toot_body += '\n\n' + filtered_tags_to_add.lstrip().rstrip()
+
+        if len(toot_body) > 500:
+            toot_body = toot_body.replace(' și ', ' & ');
+
+        toot_body = re.sub('[#][#]*', '#', toot_body);
+        print(toot_body)
+        toot_body = toot_body[:500];
 
         if toot_media is not None:
             toot = mastodon_api.status_post(
