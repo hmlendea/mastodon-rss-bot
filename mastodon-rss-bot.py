@@ -27,6 +27,7 @@ from config import (
     MAXIMUM_TOOTS_COUNT,
 )
 
+from utils import determine_content_language
 from database import init_db, get_last_entry_posted, save_posted_entry
 
 def parse_args():
@@ -52,34 +53,6 @@ days_to_check = args.days_to_check
 
 rss_feed_domain = re.sub('^[a-z]*://', '', rss_feed_url)
 sql, db = init_db()
-
-def determine_content_language(text):
-    language = 'en'
-
-    if ('ă' in text or 'â' in text or 'î' in text or 'ș' in text or 'ț' in text):
-        language = 'ro'
-    else:
-        language = 'en'
-
-    if language != 'en':
-        if (' and ' in text or
-            ' its ' in text or
-            ' of ' in text or
-            ' the ' in text or
-            ' was ' in text):
-            language = 'en'
-
-    if language != 'ro':
-        if (' de la ' in text or
-            ' miliarde ' in text):
-            language = 'ro'
-
-    if (' al patrulea ' in text or
-        'mbasadorul' in text or
-        'interzis' in text):
-        language = 'ro'
-
-    return language
 
 if not os.path.isfile("app_" + mastodon_instance + '.secret'):
     if Mastodon.create_app(
