@@ -30,16 +30,15 @@ use_privacy_frontends = True
 use_shortlink = True
 maximum_toots_count = 1
 
-
 def parse_args():
     parser = argparse.ArgumentParser(description="Mastodon RSS Bot")
-    parser.add_argument("rss", help="RSS feed URL")
-    parser.add_argument("instance", help="Mastodon instance URL")
-    parser.add_argument("username", help="Mastodon username (handle)")
-    parser.add_argument("email_address", help="Email address for login")
-    parser.add_argument("password", help="Base64-encoded password")
-    parser.add_argument("tags_to_add", help="Comma-separated tags to add")
-    parser.add_argument("days_to_check", type=int, help="How many days back to check")
+    parser.add_argument("--rss", help="RSS feed URL")
+    parser.add_argument("--instance", help="Mastodon instance URL")
+    parser.add_argument("--username", help="Mastodon username (handle)")
+    parser.add_argument("--email-address", help="Email address for login")
+    parser.add_argument("--password", help="Base64-encoded password")
+    parser.add_argument("--tags-to-add", help="Comma-separated tags to add")
+    parser.add_argument("--days-to-check", type=int, help="How many days back to check")
     return parser.parse_args()
 
 args = parse_args()
