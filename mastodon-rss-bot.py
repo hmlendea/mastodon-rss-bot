@@ -2,7 +2,6 @@ import os.path
 import sys
 import re
 
-import sqlite3
 from datetime import datetime, timedelta
 import argparse
 import base64
@@ -28,9 +27,7 @@ from config import (
     MAXIMUM_TOOTS_COUNT,
 )
 
-sql = sqlite3.connect('cache.db')
-db = sql.cursor()
-db.execute('''CREATE TABLE IF NOT EXISTS entries (feed_entry_id text, toot_id text, rss_feed_url text, mastodon_username text, mastodon_instance text)''')
+from database import init_db, get_last_entry_posted, save_posted_entry
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Mastodon RSS Bot")
@@ -54,6 +51,7 @@ tags_to_add = args.tags_to_add
 days_to_check = args.days_to_check
 
 rss_feed_domain = re.sub('^[a-z]*://', '', rss_feed_url)
+sql, db = init_db()
 
 def determine_content_language(text):
     language = 'en'
@@ -128,10 +126,7 @@ for feed_entry in reversed(feed.entries):
 
     print('Entry found: ' + feed_entry_id)
 
-    db.execute(
-        'SELECT * FROM entries WHERE feed_entry_id = ? AND mastodon_username = ? AND mastodon_instance = ?',
-        (feed_entry_id, mastodon_username, mastodon_instance))
-    last = db.fetchone()
+    last = get_last_entry_posted(db, feed_entry_id, mastodon_username, mastodon_instance)
 
     if 'published_parsed' in feed_entry:
         feed_entry_date_raw = feed_entry.published_parsed
@@ -318,9 +313,7 @@ for feed_entry in reversed(feed.entries):
                 language = toot_language)
 
             if "id" in toot:
-                db.execute("INSERT INTO entries VALUES ( ? , ? , ? , ? , ? )",
-                        (feed_entry_id, toot["id"], rss_feed_url, mastodon_username, mastodon_instance))
-                sql.commit()
+                save_posted_entry(sql, db, feed_entry_id, toot["id"], rss_feed_url, mastodon_username, mastodon_instance)
 
         toots_count += 1
         if toots_count == MAXIMUM_TOOTS_COUNT:
