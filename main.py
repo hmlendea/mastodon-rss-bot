@@ -269,9 +269,49 @@ for feed_entry in reversed(feed.entries):
             toot_body += '\n\n' + filtered_tags_to_add.lstrip().rstrip()
 
         if len(toot_body) > 500:
-            toot_body = toot_body.replace(' și ', ' & ');
+            if toot_language == 'ro':
+                toot_body = toot_body.replace(' aproximativ ', ' aprox. ');
+                toot_body = toot_body.replace(' de exemplu ', ' de ex. ');
+                toot_body = toot_body.replace(' deoarece ', ' ptc. ');
+                toot_body = toot_body.replace(' din cauza că ', ' ptc. ');
+                toot_body = toot_body.replace(' din motiv că ', ' ptc. ');
+                toot_body = toot_body.replace(' este ', ' e ');
+                toot_body = toot_body.replace(' în timp ce ', ' cât timp ');
+                toot_body = toot_body.replace(' pe motiv că ', ' ptc. ');
+                toot_body = toot_body.replace(' pe motivul că ', ' ptc. ');
+                toot_body = toot_body.replace(' pentru ', ' pt. ');
+                toot_body = toot_body.replace(' pentru că ', ' ptc. ');
+                toot_body = toot_body.replace(' pentru motivul că ', ' ptc. ');
+                toot_body = toot_body.replace(' spre exemplu ', ' de ex. ');
+                toot_body = toot_body.replace(' și ', ' & ');
+                toot_body = toot_body.replace('Aproximativ ', 'Aprox. ');
+                toot_body = toot_body.replace('De exemplu ', 'De ex. ');
+                toot_body = toot_body.replace('Este ', 'E ');
+                toot_body = toot_body.replace('Pentru ', 'Pt. ');
+                toot_body = toot_body.replace('Pentru că ', 'Ptc. ');
+                toot_body = toot_body.replace('Spre exemplu ', 'Spre ex. ');
+            elif toot_language == 'en':
+                toot_body = toot_body.replace(' and ', ' & ');
+                toot_body = toot_body.replace(' are not ', ' aren\'t ');
+                toot_body = toot_body.replace(' because ', ' b/c ');
+                toot_body = toot_body.replace(' do not ', ' don\'t ');
+                toot_body = toot_body.replace(' had not ', ' hadn\'t ');
+                toot_body = toot_body.replace(' has not ', ' hasn\'t ');
+                toot_body = toot_body.replace(' have not ', ' haven\'t ');
+                toot_body = toot_body.replace(' I am ', ' I\'m ');
+                toot_body = toot_body.replace(' information ', ' info ');
+                toot_body = toot_body.replace(' is not ', ' isn\'t ');
+                toot_body = toot_body.replace(' it is ', ' it\'s ');
+                toot_body = toot_body.replace(' that is ', ' that\'s ');
+                toot_body = toot_body.replace(' they are ', ' they\'re ');
+                toot_body = toot_body.replace(' we are ', ' we\'re ');
+                toot_body = toot_body.replace(' will not ', ' won\'t ');
+                toot_body = toot_body.replace(' without ', ' w/o ');
+                toot_body = toot_body.replace(' you are ', ' you\'re ');
             toot_body = toot_body.replace('. ', '.');
             toot_body = toot_body.replace(', ', ',');
+            toot_body = toot_body.replace('? ', '?');
+            toot_body = toot_body.replace('! ', '!');
 
 
         toot_body = re.sub('[#][#]*', '#', toot_body);
