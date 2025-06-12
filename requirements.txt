@@ -1,3 +1,4 @@
+argparse
 feedparser
 Mastodon.py
 requests
