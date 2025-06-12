@@ -1,3 +1,6 @@
+import importlib.util
+import os
+
 def determine_content_language(text):
     language = 'en'
 
@@ -25,3 +28,14 @@ def determine_content_language(text):
         language = 'ro'
 
     return language
+
+
+def try_import(filepath, module_name):
+    if not os.path.exists(filepath):
+        return None
+
+    spec = importlib.util.spec_from_file_location(module_name, filepath)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    return module
