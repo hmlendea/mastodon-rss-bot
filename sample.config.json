@@ -1,0 +1,8 @@
+{
+  "include_author": false,
+  "include_link": true,
+  "include_link_thumbnail": true,
+  "use_privacy_frontends": true,
+  "use_shortlink": true,
+  "maximum_toots_count": 1
+}
