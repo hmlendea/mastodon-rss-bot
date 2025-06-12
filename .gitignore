@@ -1,6 +1,8 @@
 config.json
 tests.py
 test.sh
+dynamic_tags.py
+text_replacements.py
 
 *.secret
 *.db
