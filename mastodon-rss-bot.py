@@ -19,27 +19,28 @@ import dynamic_tags
 
 from fake_useragent import UserAgent
 
+from config import (
+    INCLUDE_AUTHOR,
+    INCLUDE_LINK,
+    INCLUDE_LINK_THUMBNAIL,
+    USE_PRIVACY_FRONTENDS,
+    USE_SHORTLINK,
+    MAXIMUM_TOOTS_COUNT,
+)
+
 sql = sqlite3.connect('cache.db')
 db = sql.cursor()
 db.execute('''CREATE TABLE IF NOT EXISTS entries (feed_entry_id text, toot_id text, rss_feed_url text, mastodon_username text, mastodon_instance text)''')
 
-include_author = False
-include_link = True
-include_link_thumbnail = True
-use_privacy_frontends = True
-use_shortlink = True
-maximum_toots_count = 1
-
-
 def parse_args():
     parser = argparse.ArgumentParser(description="Mastodon RSS Bot")
-    parser.add_argument("rss", help="RSS feed URL")
-    parser.add_argument("instance", help="Mastodon instance URL")
-    parser.add_argument("username", help="Mastodon username (handle)")
-    parser.add_argument("email_address", help="Email address for login")
-    parser.add_argument("password", help="Base64-encoded password")
-    parser.add_argument("tags_to_add", help="Comma-separated tags to add")
-    parser.add_argument("days_to_check", type=int, help="How many days back to check")
+    parser.add_argument("--rss", help="RSS feed URL")
+    parser.add_argument("--instance", help="Mastodon instance URL")
+    parser.add_argument("--username", help="Mastodon username (handle)")
+    parser.add_argument("--email-address", help="Email address for login")
+    parser.add_argument("--password", help="Base64-encoded password")
+    parser.add_argument("--tags-to-add", help="Comma-separated tags to add")
+    parser.add_argument("--days-to-check", type=int, help="How many days back to check")
     return parser.parse_args()
 
 args = parse_args()
@@ -214,7 +215,7 @@ for feed_entry in reversed(feed.entries):
                 #print(' > Found Reddit media: ' + media_url)
                 media_urls.append(media_url)
 
-        if include_link_thumbnail and media_urls is not None and linked_page is not None:
+        if INCLUDE_LINK_THUMBNAIL and media_urls is not None and linked_page is not None:
             thumbnail_url = str(linked_page.find('meta', property='og:image'))
             thumbnail_url = thumbnail_url.replace('<meta content=\"', '')
             thumbnail_url = re.sub('\".*', '', thumbnail_url)
@@ -255,16 +256,16 @@ for feed_entry in reversed(feed.entries):
                 except:
                     print(' > Could not upload to Mastodon!')
 
-        if include_link:
+        if INCLUDE_LINK:
             feed_entry_link = feed_entry.link
 
-            if use_shortlink and linked_page is not None:
+            if USE_SHORTLINK and linked_page is not None:
                 feed_entry_shortlink_node = linked_page.find('link', rel='shortlink')
                 if feed_entry_shortlink_node is not None:
                     feed_entry_link = str(feed_entry_shortlink_node).replace('<link href=\"', '')
                     feed_entry_link = re.sub('\".*', '', feed_entry_link)
 
-            if use_privacy_frontends:
+            if USE_PRIVACY_FRONTENDS:
                 feed_entry_link = feed_entry_link.replace('old.reddit.com', 'reddit.com')
                 feed_entry_link = feed_entry_link.replace('reddit.com', 'libreddit.kavin.rocks')
                 feed_entry_link = feed_entry_link.replace('twitter.com', 'nitter.net')
@@ -276,7 +277,7 @@ for feed_entry in reversed(feed.entries):
 
             toot_body += '\n\n🔗 ' + feed_entry_link
 
-        if include_author and 'authors' in feed_entry:
+        if INCLUDE_AUTHOR and 'authors' in feed_entry:
             toot_body += '\nby ' + feed_entry.authors[0].name
 
         all_tags_to_add = ''
@@ -322,6 +323,6 @@ for feed_entry in reversed(feed.entries):
                 sql.commit()
 
         toots_count += 1
-        if toots_count == maximum_toots_count:
+        if toots_count == MAXIMUM_TOOTS_COUNT:
             print('Exiting... Reached the maximum number of toots per run!')
             break
