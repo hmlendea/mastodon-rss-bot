@@ -4,6 +4,7 @@ import re
 
 import sqlite3
 from datetime import datetime, timedelta
+import argparse
 import base64
 import hashlib
 
@@ -29,16 +30,29 @@ use_privacy_frontends = True
 use_shortlink = True
 maximum_toots_count = 1
 
-rss_feed_url = sys.argv[1]
-mastodon_instance = sys.argv[2]
-mastodon_username = sys.argv[3]
-mastodon_email_address = sys.argv[4].lower()
-mastodon_password = base64.b64decode(sys.argv[5]).decode("utf-8")
-tags_to_add = sys.argv[6]
-days_to_check = int(sys.argv[7])
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Mastodon RSS Bot")
+    parser.add_argument("rss", help="RSS feed URL")
+    parser.add_argument("instance", help="Mastodon instance URL")
+    parser.add_argument("username", help="Mastodon username (handle)")
+    parser.add_argument("email_address", help="Email address for login")
+    parser.add_argument("password", help="Base64-encoded password")
+    parser.add_argument("tags_to_add", help="Comma-separated tags to add")
+    parser.add_argument("days_to_check", type=int, help="How many days back to check")
+    return parser.parse_args()
+
+args = parse_args()
+
+rss_feed_url = args.rss
+mastodon_instance = args.instance
+mastodon_username = args.username
+mastodon_email_address = args.email_address.lower()
+mastodon_password = base64.b64decode(args.password).decode("utf-8")
+tags_to_add = args.tags_to_add
+days_to_check = args.days_to_check
 
 rss_feed_domain = re.sub('^[a-z]*://', '', rss_feed_url)
-rss_feed_domain = re.sub('/.*$', '', rss_feed_domain)
 
 def determine_content_language(text):
     language = 'en'
@@ -212,7 +226,7 @@ for feed_entry in reversed(feed.entries):
         for media_url in media_urls:
             if media_url is None or media_url == 'None' or media_urls_posted.count(media_url) > 0:
                 continue
-                
+
             try:
                 print (' > Uploading media to Mastodon: ' + media_url)
                 user_agent = UserAgent().firefox
@@ -230,7 +244,7 @@ for feed_entry in reversed(feed.entries):
             if 'image' in link.type:
                 if media_urls_posted.count(link.href) > 0:
                     continue
-                    
+
                 try:
                     media = requests.get(link.href)
                     media_posted = mastodon_api.media_post(
