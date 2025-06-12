@@ -270,6 +270,9 @@ for feed_entry in reversed(feed.entries):
 
         if len(toot_body) > 500:
             toot_body = toot_body.replace(' și ', ' & ');
+            toot_body = toot_body.replace('. ', '.');
+            toot_body = toot_body.replace(', ', ',');
+
 
         toot_body = re.sub('[#][#]*', '#', toot_body);
         print(toot_body)
