@@ -13,9 +13,6 @@ import requests
 import urllib.request
 from bs4 import BeautifulSoup
 
-import text_replacements
-import dynamic_tags
-
 from fake_useragent import UserAgent
 
 from config import (
@@ -27,8 +24,11 @@ from config import (
     MAXIMUM_TOOTS_COUNT,
 )
 
-from utils import determine_content_language
+from utils import determine_content_language, try_import
 from database import init_db, get_last_entry_posted, save_posted_entry
+
+dynamic_tags = try_import("dynamic_tags.py", "dynamic_tags")
+text_replacements = try_import("text_replacements.py", "text_replacements")
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Mastodon RSS Bot")
@@ -161,7 +161,11 @@ for feed_entry in reversed(feed.entries):
             raise ValueError('The title is missing')
 
         toot_language = determine_content_language(feed_entry_title)
-        toot_body = text_replacements.apply(feed_entry_title, toot_language)
+
+        if text_replacements:
+            toot_body = text_replacements.apply(feed_entry_title, toot_language)
+        else:
+            toot_body = feed_entry_title
 
         media_urls = []
         media_urls_posted = []
@@ -248,11 +252,8 @@ for feed_entry in reversed(feed.entries):
         if INCLUDE_AUTHOR and 'authors' in feed_entry:
             toot_body += '\nby ' + feed_entry.authors[0].name
 
-        all_tags_to_add = ''
-        dynamic_tags_to_add = dynamic_tags.get(toot_body, toot_language)
-
-        if tags_to_add: all_tags_to_add += ' ' + tags_to_add
-        if dynamic_tags_to_add: all_tags_to_add += ' ' + dynamic_tags_to_add
+        all_tags_to_add = tags_to_add
+        if dynamic_tags: all_tags_to_add += ' ' + dynamic_tags.get(toot_body, toot_language)
 
         if all_tags_to_add != '':
             filtered_tags_to_add = ''
