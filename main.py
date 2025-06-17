@@ -253,7 +253,10 @@ for feed_entry in reversed(feed.entries):
             toot_body += '\nby ' + feed_entry.authors[0].name
 
         all_tags_to_add = tags_to_add
-        if dynamic_tags: all_tags_to_add += ' ' + dynamic_tags.get(toot_body, toot_language)
+
+        tags_generated = dynamic_tags.get(toot_body, toot_language)
+        if tags_generated:
+            all_tags_to_add += ' ' + tags_generated
 
         if all_tags_to_add != '':
             filtered_tags_to_add = ''
