@@ -21,6 +21,7 @@ from config import (
     INCLUDE_LINK_THUMBNAIL,
     USE_PRIVACY_FRONTENDS,
     USE_SHORTLINK,
+    MONETISE_LINKS,
     MAXIMUM_TOOTS_COUNT,
 )
 
@@ -247,8 +248,10 @@ for feed_entry in reversed(feed.entries):
             feed_entry_link = re.sub('\\?utm.*$', '', feed_entry_link)
             feed_entry_link = re.sub('/$', '', feed_entry_link)
 
-            toot_body += '\n\n🔗 ' + feed_entry_link
-
+            if MONETISE_LINKS:
+                toot_body += '\n\n🔗 ' + 'https://shrinkme.io/st?api=81ad7e29077269bcae6dc1773d87abbabeaa9aa8&url=' + feed_entry_link
+            else:
+                toot_body += '\n\n🔗 ' + feed_entry_link
         if INCLUDE_AUTHOR and 'authors' in feed_entry:
             toot_body += '\nby ' + feed_entry.authors[0].name
 
