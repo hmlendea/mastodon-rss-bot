@@ -254,6 +254,9 @@ for feed_entry in reversed(feed.entries):
 
         all_tags_to_add = tags_to_add
 
+        if dynamic_tags:
+            tags_generated = dynamic_tags.get(toot_body, toot_language)
+
         tags_generated = dynamic_tags.get(toot_body, toot_language)
         if tags_generated:
             all_tags_to_add += ' ' + tags_generated
