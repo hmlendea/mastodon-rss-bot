@@ -23,4 +23,5 @@ INCLUDE_LINK = cfg["include_link"]
 INCLUDE_LINK_THUMBNAIL = cfg["include_link_thumbnail"]
 USE_PRIVACY_FRONTENDS = cfg["use_privacy_frontends"]
 USE_SHORTLINK = cfg["use_shortlink"]
+MONETISE_LINKS = cfg.get("monetise_links", True)
 MAXIMUM_TOOTS_COUNT = cfg["maximum_toots_count"]
