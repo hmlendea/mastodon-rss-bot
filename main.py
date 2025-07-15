@@ -35,9 +35,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Mastodon RSS Bot")
     parser.add_argument("--rss", help="RSS feed URL")
     parser.add_argument("--instance", help="Mastodon instance URL")
-    parser.add_argument("--username", help="Mastodon username (handle)")
-    parser.add_argument("--email-address", help="Email address for login")
-    parser.add_argument("--password", help="Base64-encoded password")
+    parser.add_argument("--username", help="Mastodon username")
+    parser.add_argument("--access-token", help="Mastodon access token")
     parser.add_argument("--tags-to-add", help="Comma-separated tags to add")
     parser.add_argument("--days-to-check", type=int, help="How many days back to check")
     return parser.parse_args()
@@ -47,8 +46,7 @@ args = parse_args()
 rss_feed_url = args.rss
 mastodon_instance = args.instance
 mastodon_username = args.username
-mastodon_email_address = args.email_address.lower()
-mastodon_password = base64.b64decode(args.password).decode("utf-8")
+mastodon_access_token = args.access_token
 tags_to_add = args.tags_to_add
 days_to_check = args.days_to_check
 
@@ -68,17 +66,11 @@ if not os.path.isfile("app_" + mastodon_instance + '.secret'):
 
 try:
     mastodon_api = Mastodon(
-        client_id = "app_" + mastodon_instance + '.secret',
+        access_token = mastodon_access_token,
         api_base_url = 'https://' + mastodon_instance
     )
-    mastodon_api.log_in(
-        mastodon_email_address,
-        password = mastodon_password,
-        scopes = ['read', 'write'],
-        to_file = "app_" + mastodon_username + "@" + mastodon_instance + ".secret"
-    )
-except:
-    print("ERROR: Failed to log " + mastodon_username + " into " + mastodon_instance)
+except Exception as ex:
+    print("ERROR: Failed to log " + mastodon_username + " into " + mastodon_instance + ": " + ex)
     sys.exit(1)
 
 feed = feedparser.parse(rss_feed_url)
