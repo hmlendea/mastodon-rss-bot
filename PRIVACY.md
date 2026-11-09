@@ -4,18 +4,18 @@ This document describes how Mastodon RSS Bot, a self-hosted command-line applica
 
 ## 📑 Table of Contents
 
-- [🔎 What This Document Covers](#-what-this-document-covers)
-- [🏠 Self-Hosted Deployments](#-self-hosted-deployments)
-- [📥 Data We Handle](#-data-we-handle)
+- [What This Document Covers](#-what-this-document-covers)
+- [Self-Hosted Deployments](#-self-hosted-deployments)
+- [Data We Handle](#-data-we-handle)
   - [Data Provided to the Application](#data-provided-to-the-application)
   - [Data Generated or Collected by the Application](#data-generated-or-collected-by-the-application)
   - [Data Received from Integrations](#data-received-from-integrations)
-- [🧭 Processing and Use](#-processing-and-use)
-- [🗄️ Storage, Retention, and Deletion](#-storage-retention-and-deletion)
-- [🔗 External Processing and Integrations](#-external-processing-and-integrations)
-- [🛡️ Data Protection and Security](#-data-protection-and-security)
-- [🔄 Document Changes](#-document-changes)
-- [📬 Contact](#-contact)
+- [Processing and Use](#-processing-and-use)
+- [Storage, Retention, and Deletion](#-storage-retention-and-deletion)
+- [External Processing and Integrations](#-external-processing-and-integrations)
+- [Data Protection and Security](#-data-protection-and-security)
+- [Document Changes](#-document-changes)
+- [Contact](#-contact)
 
 ## 🔎 What This Document Covers
 
