@@ -66,3 +66,9 @@ For the detailed description of how the application handles privacy and personal
 ## 📜 Code of Conduct
 
 See the [Code of Conduct](./CODE_OF_CONDUCT.md) for the standards of conduct expected in all project spaces.
+
+## 🔒 Security
+
+Mastodon RSS Bot follows a coordinated disclosure policy for security vulnerabilities.
+
+For information on reporting security vulnerabilities, see the [Security Policy](./SECURITY.md).
