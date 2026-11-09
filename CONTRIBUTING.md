@@ -4,7 +4,7 @@ This document covers the guidelines and processes for contributing to this proje
 
 ## 📑 Table of Contents
 
-- [🤝 Contributing](#-contributing)
+- [Contributing](#-contributing)
   - [Reporting Issues](#reporting-issues)
   - [Suggesting Enhancements](#suggesting-enhancements)
   - [Code Contributions](#code-contributions)
@@ -14,8 +14,8 @@ This document covers the guidelines and processes for contributing to this proje
     - [Pull Request Guidelines](#pull-request-guidelines)
   - [Code Style](#code-style)
   - [Documentation](#documentation)
-- [📄 License](#-license)
-- [❓ Getting Assistance](#-getting-assistance)
+- [License](#-license)
+- [Getting Assistance](#-getting-assistance)
 
 ## 🤝 Contributing
 
@@ -82,6 +82,10 @@ Follow the project's coding standards:
 ## 📄 License
 
 By contributing, you agree that your contributions will be licensed under the GNU General Public License Version 3 or later.
+
+## 📜 Code of Conduct
+
+This project follows the [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## ❓ Getting Assistance
 
