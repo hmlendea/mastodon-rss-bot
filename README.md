@@ -62,3 +62,7 @@ For the detailed description of how the application handles privacy and personal
 
 # Credits
 [cquest/tootbot](https://github.com/cquest/tootbot) the original script this bot is based on
+
+## 📜 Code of Conduct
+
+See the [Code of Conduct](./CODE_OF_CONDUCT.md) for the standards of conduct expected in all project spaces.
