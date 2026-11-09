@@ -87,6 +87,12 @@ By contributing, you agree that your contributions will be licensed under the GN
 
 This project follows the [Code of Conduct](./CODE_OF_CONDUCT.md).
 
+## 🔒 Security
+
+Mastodon RSS Bot follows a coordinated disclosure policy for security vulnerabilities.
+
+For information on reporting security vulnerabilities, see the [Security Policy](./SECURITY.md).
+
 ## ❓ Getting Assistance
 
 - Check existing discussions and documentation first.
