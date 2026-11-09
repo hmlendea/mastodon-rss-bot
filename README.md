@@ -60,6 +60,12 @@ For the detailed description of how the application handles privacy and personal
 | RSS feed content and linked pages | Source material for toots | Transient in memory during run | Not persisted by application | No |
 | Console log output | Run-time status and debugging | Standard output | Not persisted by application | No |
 
+## 🏗️ Architecture
+
+Mastodon RSS Bot is a scheduled, single-process Python batch pipeline that fetches RSS feed entries, enriches them with linked-page metadata and media, and posts them to Mastodon through modular configuration, persistence, and utility boundaries.
+
+See the [Architecture Documentation](./ARCHITECTURE.md) for the system context, principal components, runtime flows, ownership boundaries, dependencies, constraints, and extension points.
+
 # Credits
 [cquest/tootbot](https://github.com/cquest/tootbot) the original script this bot is based on
 
